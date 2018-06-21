@@ -1,0 +1,28 @@
+schemaVersion: '2.2'
+description: Disk Usage - Lists useful Disk Utilization details
+mainSteps:
+- action: aws:runShellScript
+  name: OperateService
+  precondition:
+    StringEquals:
+    - platformType
+    - Linux
+  inputs:
+    runCommand:
+    - source /etc/profile 
+    - echo -e "\\n\\n================================================================================"
+    - echo -e "SSM Operate - Disk Usage Metrics"
+    - echo -e "================================================================================"
+    - echo -e "SSM Start Time - $(date +%y-%m-%d) $(date +%T) $(date +%Z)"
+    - echo -e "\\nOperating on...\\nService:${NAVSERVICE} || Host:${HOSTNAME}"
+    - echo -e "\\nAll Partition - Usage%..."
+    - echo -e "df -h --total"
+    - df -h --total
+    - echo -e "\\nOS Partition - Top 5 Folders consuming disk..."
+    - echo -e "sudo du -sk /data/* | sort -nr | head -5"
+    - sudo du -sk /data/* | sort -nr | head -5
+    - echo -e "\\nApp Partition - Top 5 Folders consuming disk..."
+    - echo -e "sudo du -sk /data/* | sort -nr | head -5"
+    - sudo du -sk /data/* | sort -nr | head -5
+    - echo -e "\\nSSM End Time - $(date +%y-%m-%d) $(date +%T) $(date +%Z)"
+    - echo -e "======================================================================\\n\\n"
