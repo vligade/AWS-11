@@ -1,0 +1,22 @@
+schemaVersion: '2.2'
+description: Operate service
+parameters:
+  operation:
+    description: Service operation to perform
+    type: String
+    allowedValues:
+    - start
+    - stop
+    - restart
+mainSteps:
+- action: aws:runShellScript
+  name: OperateService
+  precondition:
+    StringEquals:
+    - platformType
+    - Linux
+  inputs:
+    runCommand:
+    - echo "Execute {{ operation }} operation for service ${NAVSERVICE}"
+    - source /etc/profile 
+    - service ${NAVSERVICE} {{ operation }}
