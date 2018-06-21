@@ -1,0 +1,21 @@
+schemaVersion: '2.2'
+description: Utility - Reboot Instance - Reboots the instance
+mainSteps:
+- action: aws:runShellScript
+  name: OperateService
+  precondition:
+    StringEquals:
+    - platformType
+    - Linux
+  inputs:
+    runCommand:
+    - source /etc/profile 
+    - echo -e "\\n\\n================================================================================"
+    - echo -e "SSM Operate - Reboot Instance"
+    - echo -e "================================================================================"
+    - echo -e "SSM Start Time - $(date +%y-%m-%d) $(date +%T) $(date +%Z)"
+    - echo -e "\\nOperating on...\\nService:${NAVSERVICE} || Host:${HOSTNAME}"
+    - echo -e "\\nInitiating reboot on ${HOSTNAME}..."
+    - sudo reboot
+    - echo -e "\\n\\nSSM End Time - $(date +%y-%m-%d) $(date +%T) $(date +%Z)"
+    - echo -e "======================================================================\\n\\n"
