@@ -1,0 +1,44 @@
+---
+description: "run bash script to filter network packet using iptables"
+schemaVersion: "2.2"
+parameters:
+ operation:
+   allowedValues:
+   - show
+   - dropall
+   - drop5
+   - drop25
+   - drop50
+   - reset
+   default: show
+   description: Service operation to perform
+   type: String
+ PORT:
+   type: String
+   description: (Optional) Enter Port Number
+ Hostname:
+   type: String
+   description: Ip Address/Hostname 
+mainSteps:
+- action: aws:runShellScript
+  name: OperateIptablesCommands
+  precondition:
+   StringEquals:
+   - platformType
+   - Linux
+  inputs:
+   runCommand:
+   - echo "The port number is:" {{PORT}}
+   - if [ {{operation}} == 'show' ] ; then sudo iptables -L -n
+   - fi
+   - ip=$(dig +short {{Hostname}})
+   - for var in ${ip}; do
+   -   if [ {{operation}} == 'drop5' ] ; then iptables -A OUTPUT -p tcp -d ${var} --dport {{PORT}} -m statistic --mode random --probability 0.05 -j DROP
+   -   elif [ {{operation}} == 'drop25' ] ; then iptables -A OUTPUT -p tcp -d ${var} --dport {{PORT}} -m statistic --mode random --probability 0.25 -j DROP
+   -   elif [ {{operation}} == 'drop50' ] ; then iptables -A OUTPUT -p tcp -d ${var} --dport {{PORT}} -m statistic --mode random --probability 0.5 -j DROP    
+   -   elif [ {{operation}} == 'dropall' ] ; then iptables -A OUTPUT -p tcp -d ${var} --dport {{PORT}} -j DROP
+   -   fi
+   - done
+   - service iptables save
+   - if [ {{operation}} == 'reset' ] ; then sudo iptables -F
+   - fi
